@@ -60,7 +60,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
         defaultTokenServices.setTokenStore(tokenStore());
         defaultTokenServices.setAccessTokenValiditySeconds(1000 * 60 * 1);
-        defaultTokenServices.setRefreshTokenValiditySeconds(1000 * 60 * 24 * 7);
+        defaultTokenServices.setRefreshTokenValiditySeconds(1000 * 60);
         defaultTokenServices.setSupportRefreshToken(true);
         return defaultTokenServices;
     }

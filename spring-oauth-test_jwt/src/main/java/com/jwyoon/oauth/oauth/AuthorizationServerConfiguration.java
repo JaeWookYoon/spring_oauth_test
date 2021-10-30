@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.provider.code.AuthorizationCodeServic
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -43,7 +44,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Bean
     public TokenStore tokenStore() {
     	JwtTokenStore tokenStore= new MyJwtTokenStore(accessTokenConverter(),dataSource);
-        tokenStore.setApprovalStore(new TokenApprovalStore()); 
+    	TokenApprovalStore approvalStore = new TokenApprovalStore();
+    	approvalStore.setTokenStore(new JdbcTokenStore(dataSource));
+        tokenStore.setApprovalStore(approvalStore); 
         return tokenStore;
     }
 
@@ -61,6 +64,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         defaultTokenServices.setTokenStore(tokenStore());
         defaultTokenServices.setAccessTokenValiditySeconds(1000 * 60 * 1);
         defaultTokenServices.setRefreshTokenValiditySeconds(1000 * 60);
+        defaultTokenServices.setReuseRefreshToken(false);
         defaultTokenServices.setSupportRefreshToken(true);
         return defaultTokenServices;
     }

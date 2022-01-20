@@ -1,12 +1,18 @@
 package com.jwyoon.oauth.oauth;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -17,12 +23,15 @@ import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.error.DefaultWebResponseExceptionTranslator;
+import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+import com.jwyoon.oauth.error.PasswordNotMatchException;
 import com.jwyoon.oauth.service.UserDetailServiceImpl;
 
 /**
@@ -40,7 +49,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     @Autowired
     private UserDetailServiceImpl userDetailsService;
-
+        
+    @Autowired
+    private PasswordEncoders passwordEncoder;
+    
     @Bean
     public TokenStore tokenStore() {
     	JwtTokenStore tokenStore= new MyJwtTokenStore(accessTokenConverter(),dataSource);
@@ -94,13 +106,28 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     protected AuthorizationCodeServices authorizationCodeServices() {
         return new JdbcAuthorizationCodeServices(dataSource);
     }
-
+            
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-// OAuth2 서버가 작동하기 위한 Endpoint에 대한 정보를 설정
+// OAuth2 서버가 작동하기 위한 Endpoint에 대한 정보를 설정    	
         endpoints.authenticationManager(authenticationManager).tokenStore(tokenStore()).accessTokenConverter(accessTokenConverter());
         endpoints.userDetailsService(userDetailsService);
+        endpoints.exceptionTranslator(authorizationWebResponseExceptionTranslator());
         endpoints.authorizationCodeServices(authorizationCodeServices());
         endpoints.reuseRefreshTokens(false);
+    }
+    
+    @SuppressWarnings("rawtypes")
+	public WebResponseExceptionTranslator authorizationWebResponseExceptionTranslator() {
+        return new DefaultWebResponseExceptionTranslator() {
+
+            @Override
+            public ResponseEntity<OAuth2Exception> translate(Exception e) throws Exception {
+                Map responseMap = new HashMap();
+                if(e instanceof PasswordNotMatchException) responseMap.put("code", ((PasswordNotMatchException) e).getHttpStatus().getReasonPhrase()); 
+                responseMap.put("message", e.getMessage());
+                return new ResponseEntity(responseMap, HttpStatus.UNAUTHORIZED);
+            }
+        };
     }
 }

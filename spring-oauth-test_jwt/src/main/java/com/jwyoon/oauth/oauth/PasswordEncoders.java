@@ -3,9 +3,12 @@ package com.jwyoon.oauth.oauth;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import com.jwyoon.oauth.error.PasswordNotMatchException;
 
 @Component
 public class PasswordEncoders implements PasswordEncoder {
@@ -25,9 +28,18 @@ public class PasswordEncoders implements PasswordEncoder {
 	}
 
 	@Override
-	public boolean matches(CharSequence rawPassword, String encodedPassword) {
-		//System.out.println(rawPassword + " PASSWORD = " + encodedPassword);
-		return passwordEncoder.matches(rawPassword,encodedPassword);
+	public boolean matches(CharSequence rawPassword, String encodedPassword){
+		if(rawPassword == null) {
+			throw new PasswordNotMatchException("패스워드를 입력하세요.",null,HttpStatus.BAD_REQUEST);
+		}
+		System.out.println(rawPassword + " PASSWORD = " + encodedPassword);
+		boolean result = passwordEncoder.matches(rawPassword,encodedPassword);
+		
+		if(!result) { 			
+			throw new PasswordNotMatchException("password not matched",null,HttpStatus.BAD_REQUEST);			
+		}
+		 
+		return result;
 	}
 
 	public static void main(String[] args) {

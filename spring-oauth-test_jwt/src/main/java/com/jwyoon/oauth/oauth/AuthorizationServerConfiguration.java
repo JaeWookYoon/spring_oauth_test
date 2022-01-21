@@ -84,7 +84,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Bean
     @Primary
     public JdbcClientDetailsService JdbcClientDetailsService(DataSource dataSource) {
-        return new JdbcClientDetailsService(dataSource);
+    	JdbcClientDetailsService jdbcClient = new JdbcClientDetailsService(dataSource);
+    	jdbcClient.setPasswordEncoder(passwordEncoder);
+        return jdbcClient;
     }
 
     @Autowired

@@ -46,9 +46,15 @@ public class PasswordEncoders implements PasswordEncoder {
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String s = "client:{noop}1234";
 		String a = "1234";
-		String b = "{noop}1234";
+		String b1 = "1234";//"{noop}1234";
+		String b = "eaab3a57-f601-4307-82f0-a2d686cac5a1";
+		String c = passwordEncoder.encode(b);
+		String d = passwordEncoder.encode(c);
 		System.out.println(passwordEncoder.encode(a));
-		System.out.println(passwordEncoder.encode(b));
+		System.out.println(c);
+		System.out.println(passwordEncoder.matches(b1, c));
+		System.out.println(passwordEncoder.matches(c, d));
+		System.out.println(passwordEncoder.matches(b1, d));
 		byte[] encodedAuth = Base64.encodeBase64(s.getBytes(StandardCharsets.ISO_8859_1));
         String authHeader = "Basic " + new String(encodedAuth);
 		//System.out.println(passwordEncoder.encode(s));

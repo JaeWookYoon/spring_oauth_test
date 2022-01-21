@@ -17,6 +17,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,7 +125,7 @@ public class DefaultController {
         String authHeader = "Basic " + new String(encodedAuth);
         System.out.println(auth + " , Basic "+new String(encodedAuth));
         post.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-        
+        JSONParser parser = new JSONParser();
         String result = null;
         try {
 			  WebClient web = WebClient.create();
@@ -139,8 +140,8 @@ public class DefaultController {
 			  .bodyToMono(JSONObject.class)
 			  .block().toJSONString();
 			 
-			  	 
-			  System.out.println(result);
+			  JSONObject resultJ = (JSONObject)parser.parse(result);
+			  System.out.println(resultJ.get("access_token"));
 			 
         } catch (Exception e) {
             e.printStackTrace();

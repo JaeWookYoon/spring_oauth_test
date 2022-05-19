@@ -1,11 +1,10 @@
 package com.jwyoon.oauth.controller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -13,18 +12,16 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Consts;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -113,14 +110,14 @@ public class DefaultController {
         JSONObject json = new JSONObject();
         
         HttpPost post = new HttpPost("http://localhost:8080/oauth/token");
-        List<NameValuePair> form = new ArrayList<>();
+        Map<String,Object> form = new HashMap<String,Object>();
 
         
-        form.add(new BasicNameValuePair("grant_type", "password"));
-        form.add(new BasicNameValuePair("username", username));
-        form.add(new BasicNameValuePair("password", password));
-        form.add(new BasicNameValuePair("client_id", client_id));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, Consts.UTF_8);
+        form.put("grant_type", "password");
+        form.put("username", username);
+        form.put("password", password);
+        form.put("client_id", client_id);
+        //UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, Consts.UTF_8);
         UserList user = userListRepository.findUserById(username);
         
         String auth = username + ":" + user.getIdx();// userlist Idx ?? oauth_client_details client_secret?�� ?��?��매핑?��???��.
@@ -128,8 +125,6 @@ public class DefaultController {
         String authHeader = "Basic " + new String(encodedAuth);
         System.out.println(auth + " , Basic "+new String(encodedAuth));
         post.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-        post.setHeader("Content-Type", "application/x-www-form-urlencoded");
-        post.setEntity(entity);
         JSONParser parser = new JSONParser();
         String result = null;
         try {
@@ -137,14 +132,16 @@ public class DefaultController {
 			  result = web.post().
 			  uri("http://localhost:8080/oauth/token")
 			  .header(HttpHeaders.AUTHORIZATION, authHeader)
-			  .header("Content-Type","application/x-www-form-urlencoded; charset=utf-8")
-			  .bodyValue(form)
+			  //.header("Content-Type","application/x-www-form-urlencoded; charset=utf-8")
+			  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+			  .acceptCharset(Charset.forName("UTF-8"))
+			  .bodyValue("grant_type=password&username="+username+"&password="+password)			  
 			  .retrieve()
 			  .bodyToMono(JSONObject.class)
 			  .block().toJSONString();
 			 
-			  	 
-			  
+			  JSONObject resultJ = (JSONObject)parser.parse(result);
+			  System.out.println(resultJ.get("access_token"));
 			 
         } catch (Exception e) {
             e.printStackTrace();

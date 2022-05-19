@@ -49,7 +49,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/**").hasAnyRole("USER")                 
                 .anyRequest().authenticated()
                 .and()
-                .exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+                .exceptionHandling();
     }
     @Override
     @Bean
@@ -60,7 +60,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {    	
     	auth.parentAuthenticationManager(authenticationManagerBean()).userDetailsService(userDetailsService)
-    	.passwordEncoder(passwordEncoders);    	
+    	.passwordEncoder(passwordEncoders);	
     }
     @Bean
     CorsConfigurationSource corsConfigurationSource() {

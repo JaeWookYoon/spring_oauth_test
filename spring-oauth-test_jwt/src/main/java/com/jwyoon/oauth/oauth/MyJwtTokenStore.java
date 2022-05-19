@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.support.SqlLobValue;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.common.util.SerializationUtils;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -63,6 +62,9 @@ public class MyJwtTokenStore extends JwtTokenStore{
 				new SqlLobValue(serializeRefreshToken(refreshToken)),
 				new SqlLobValue(serializeAuthentication(authentication)) }, new int[] { Types.VARCHAR, Types.BLOB,
 				Types.BLOB });
+	}
+	public OAuth2RefreshToken readRefreshToken(String tokenValue) {
+		return super.readRefreshToken(tokenValue);
 	}
 	// extract key. decode
 	private String extractTokenKey(String value) {

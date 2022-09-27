@@ -12,20 +12,10 @@ import javax.persistence.*;
 public class UserAuth implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private String idx;
 
 	private String auth;	
-
-	private String id;
-
-	public String getIdx() {
-		return this.idx;
-	}
-
-	public void setIdx(String idx) {
-		this.idx = idx;
-	}
+	@Id
+	private String id;	
 
 	public String getAuth() {
 		return this.auth;

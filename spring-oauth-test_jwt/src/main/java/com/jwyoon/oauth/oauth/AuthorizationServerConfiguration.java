@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -55,17 +56,13 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     
     @Bean
     public TokenStore tokenStore() {
-    	JwtTokenStore tokenStore= new MyJwtTokenStore(accessTokenConverter(),dataSource);
-    	TokenApprovalStore approvalStore = new TokenApprovalStore();
-    	approvalStore.setTokenStore(new JdbcTokenStore(dataSource));
-        tokenStore.setApprovalStore(approvalStore); 
-        return tokenStore;
+    	return new JwtTokenStore(accessTokenConverter());    	
     }
 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
     	JwtAccessTokenConverter jwt = new JwtAccessTokenConverter();
-    	jwt.setSigningKey("jwt");
+    	jwt.setSigningKey("testjwtjwyoon");
     	return jwt;
     }
 
@@ -74,8 +71,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     public DefaultTokenServices tokenService() {
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
         defaultTokenServices.setTokenStore(tokenStore());        
-        defaultTokenServices.setReuseRefreshToken(false);
         defaultTokenServices.setSupportRefreshToken(true);
+        defaultTokenServices.setClientDetailsService(clientDetailsService);
         return defaultTokenServices;
     }
 
@@ -110,11 +107,13 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 // OAuth2 서버가 작동하기 위한 Endpoint에 대한 정보를 설정    	
-        endpoints.authenticationManager(authenticationManager).tokenStore(tokenStore()).accessTokenConverter(accessTokenConverter());
+        endpoints.authenticationManager(authenticationManager)
+        .tokenStore(tokenStore()).accessTokenConverter(accessTokenConverter());
         endpoints.userDetailsService(userDetailsService);
         endpoints.exceptionTranslator(authorizationWebResponseExceptionTranslator());
-        endpoints.authorizationCodeServices(authorizationCodeServices());
-        endpoints.reuseRefreshTokens(false);
+        //endpoints.authorizationCodeServices(authorizationCodeServices()).tokenServices(tokenService());
+        endpoints.reuseRefreshTokens(false);        
+        endpoints.allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST,HttpMethod.PUT,HttpMethod.DELETE);
     }
     
     @SuppressWarnings("rawtypes")

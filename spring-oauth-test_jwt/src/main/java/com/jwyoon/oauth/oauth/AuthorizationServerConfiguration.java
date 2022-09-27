@@ -73,9 +73,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Primary
     public DefaultTokenServices tokenService() {
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setTokenStore(tokenStore());
-        defaultTokenServices.setAccessTokenValiditySeconds(1000 * 60 * 1);
-        defaultTokenServices.setRefreshTokenValiditySeconds(1000 * 60);
+        defaultTokenServices.setTokenStore(tokenStore());        
         defaultTokenServices.setReuseRefreshToken(false);
         defaultTokenServices.setSupportRefreshToken(true);
         return defaultTokenServices;

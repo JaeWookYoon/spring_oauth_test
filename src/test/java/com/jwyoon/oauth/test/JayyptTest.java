@@ -11,19 +11,18 @@ public class JayyptTest {
 
     @Test
     public void jasypt() {
-        String url = "jdbc:oracle:thin:@jakedbdb_high?TNS_ADMIN=./wallet";
+        String url = "jdbc:oracle:thin:@jakedbdb_high?TNS_ADMIN=/src/main/resources/wallet";
         
-
         System.out.println(jasyptEncoding(url));
         //System.out.println(jasyptEncoding(username));
         //System.out.println(jasyptEncoding(password));
     }
 
     public String jasyptEncoding(String value) {
-
+    	
         StandardPBEStringEncryptor pbeEnc = new StandardPBEStringEncryptor();
         pbeEnc.setAlgorithm("PBEWithMD5AndDES");
-//        pbeEnc.setPassword(key);
+        //pbeEnc.setPassword(key);
         return pbeEnc.encrypt(value);
     }
 }

@@ -27,6 +27,9 @@ local.properties
 # CDT-specific (C/C++ Development Tooling)
 .cproject
 
+#target
+target/
+
 # CDT- autotools
 .autotools
 
@@ -116,8 +119,9 @@ $RECYCLE.BIN/
 *.msix
 *.msm
 *.msp
+
 #DB files
-*/wallet/
+wallet/
 
 # Windows shortcuts
 *.lnk

@@ -21,11 +21,10 @@ public class JayyptTest {
 	}
 	public String jasyptEncoding(String value) {
 
-        String key = "jwyoon0717secret_key";
-	
+        
 		StandardPBEStringEncryptor pbeEnc = new StandardPBEStringEncryptor();
 		pbeEnc.setAlgorithm("PBEWithMD5AndDES"); //
-		pbeEnc.setPassword(key); 
+		//pbeEnc.setPassword(key); 
 		return pbeEnc.encrypt(value);
 	}
 

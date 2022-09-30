@@ -6,7 +6,6 @@
 
 	<groupId>com.jwyoon.oauth</groupId>
 	<artifactId>test</artifactId>
-	<packaging>jar</packaging>
 	<name>test-oauth-jwt</name>
 	<description>Spring Boot Web Spring Security Example</description>
 	<version>1.0</version>
